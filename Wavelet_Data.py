@@ -13,7 +13,6 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.dataloader import DataLoader
 
-
 class HiddenPrints:
     """
     Helper class to suppress mne print statements
@@ -74,7 +73,7 @@ class Wavelet_Dataset(Dataset):
 
     def Wavelet(self,path:str):
         """
-        create data cubes using data from .fif file at path. of the form 
+        create data cubes using data from .fif file at path. of the form
         (Lead)x(scale)x(time).
 
         Args:
@@ -89,6 +88,7 @@ class Wavelet_Dataset(Dataset):
 
         with HiddenPrints():
             raw = mne.io.read_raw_fif(path)
+            
         raw = raw.get_data(picks=raw.ch_names, start=0)
 
         data = pd.DataFrame(data=raw)
@@ -99,7 +99,7 @@ class Wavelet_Dataset(Dataset):
 
 
         # Generate a 3d array of channelXfreqXtime
-        waves_mag = np.empty([61, scale, 250 ], dtype=float) 
+        waves_mag = np.empty([61, scale, 250 ], dtype=float)
 
         # compute and store complex morlet transform for each lead
         # THIS VERSION PUTS Lead First
@@ -142,4 +142,4 @@ class Wavelet_Dataset(Dataset):
     def __len__(self):
 
         return len(self.samples)
-    
+

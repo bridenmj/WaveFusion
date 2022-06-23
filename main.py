@@ -6,36 +6,38 @@ import os
 import copy
 import torch
 from tqdm.notebook import trange, tqdm
+from torch import nn
 
 if __name__ == "__main__":
 
-    batch_size = 10
-    learning_rate =0.001
-    weight_decay = 0.1
-    momentum = 0.0005
-    num_epochs = 20
-    beta = 0.25
+batch_size = 500
+learning_rate =0.001
+weight_decay = 7.5e-4
+momentum = 0.0005
+num_epochs = 35
 
-    data_dir= "~/1sec_seg_training_class_fif_5000"
-    save = True
-    save_as = "~/WaveFusion_5000_20ep"
-    load_wts = False
-    path_wts = "" # "Saved_Models"
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+#save model?
+save = False
+#ex: "save_as = <fileName>.pt" or "save_as = <fileName>.pth"
+save_as = ""
 
-    data_loaders_dict = {x: wavelet_dataloader(data_dir = os.path.join(data_dir,x), batch_size = batch_size, shuffle=True) for x in ['train', 'val']}
+#load wts from torch.nn.Module.load_state_dict for "model"?
+load_wts = False
 
-    Wave_model = Wave_Fusion_Model(beta = beta).to(device)
+#path torch.nn.Module.load_state_dict for "model"
+path_wts = "" # "Saved_Models"
 
-    lossfun = torch.nn.CrossEntropyLoss()
+#set to train w/ GPU if available else cpu
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+#device = xm.xla_device()
+print(device)
 
-    optim = torch.optim.Adam(Wave_model.parameters(), lr=0.1 ,weight_decay = weight_decay)
+    wavelet_datasets = {x: Wavelet_Dataset(os.path.join(data_dir, x), transform=data_transforms[x]) for x in ['train', 'val']}
+    data_loaders_dict = {x: wavelet_dataloader(dataset=wavelet_datasets[x], batch_size = batch_size, shuffle=True) for x in ['train', 'val']}
 
-    Wave_model, history = train_model(model = Wave_model,
-        dataloaders = data_loaders_dict,
-        lossfun = lossfun,optimizer = optim,
-        wts_path = path_wts,
-        epochs=num_epochs,
-        load_wts = load_wts,
-        save_as = save_as,
-        save = save)
+    Wave_model = Wave_Fusion_Model( device = device).to(device)
+    
+    optim = torch.optim.Adam(Wave_model.parameters(), lr=learning_rate , weight_decay=weight_decay)
+    lossfun = nn.CrossEntropyLoss()
+
+    model, history = train_model(model = Wave_model, dataloaders = data_loaders_dict, loss = lossfun, save = save, save_as = save_as, optimizer = optim, epochs=num_epochs,load_wts = load_wts, wts = path_wts)
