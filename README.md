@@ -6,7 +6,7 @@ Official Implementation of the [WaveFusion Squeeze-and-Excitation: Towards an Ac
 ![figure1](./Figure/Wave_Fusion.png)
 
 # Dataset
-Retrieve the data [here](https://drive.google.com/drive/folders/1B9yLeR_dNSnT7wAm2Gstbwt29KavTXiT?usp=sharing) and save it to the same directory as main.py.
+Retrieve the data [here](https://drive.google.com/drive/folders/1r0eryDP7L1y1VBrLLTfBYPVrsafCgtPH?usp=sharing) and save it to the same directory as main.py.
 
 # Install MNE
 This work requires MNE. After creating a virtual environment, download and install MNE:
